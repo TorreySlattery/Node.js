@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href="/stylesheets/signin.css">
+    <script src='/javascripts/jquery-2.0.3.min.js'></script>
+    <script src='/socket.io/socket.io.js'></script>
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Hold Fast!</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/play/">Play!</a></li>
+            <li><a href="/guide/">Guide</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/login">Log In</a></li>
+            <li class="active"><a href="/register/">Register</a></li>
+            <li><a href="/help/">Help</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    <div class="col-md-4"></div>
+    <div class="jumbotron col-md-4">
+      <form id="myForm" action="/process_registration/"class="form-signin" role="form" method="post">
+        <% if(message!=""){ %>
+        <div class="form-signin-heading alert alert-danger"><%= message %></div>
+        <% } %>
+        <input type="text" class="form-control" name="name" placeholder="User Name" required autofocus>
+        <input type="text" class="form-control" name="email" placeholder="Email address" required>
+        <input type="password" class="form-control" name="password" placeholder="Password" required>
+        
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+      </form>
+    </div>
+    <div class="col-md-4"></div>
+  </div>
+</body>   
+
+<!--
+<script>
+    $(document).ready(function(){
+      io = io.connect(); 
+
+      $('#myForm').submit(function(){
+        var $inputs = $('#myForm :input');
+
+        var values = {};
+        $inputs.each(function(){
+          values[this.name] = $(this).val();
+        });
+        io.emit('new_user', values);
+        // return false;
+      });
+    });
+</script>
+-->
+
+</html>

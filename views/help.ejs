@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <script src='/javascripts/jquery-2.0.3.min.js'></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src='/javascripts/bootstrap.min.js'></script>
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Hold Fast!</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/play/">Play!</a></li>
+            <li><a href="/guide/">Guide</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+            <li><a href="/logout">Sign Out</a></li>
+            <% }else{ %>
+            <li><a href="/login">Log In</a></li>
+            <% } %>
+
+            <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+            <li><a href="/account">Your Account</a></li>
+            <% }else{ %>
+            <li><a href="/register">Register</a></li>
+            <% } %>
+            <li class="active"><a href="/help/">Help</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+</body>   
+
+<script>
+    $(document).ready(function(){
+    });
+</script>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <script src='/javascripts/jquery-2.0.3.min.js'></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src='/javascripts/bootstrap.min.js'></script>
+    
+  </head>
+  <body>
+        <div class="container">
+            <div class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+                  <a class="navbar-brand" href="/">Hold Fast!</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                  <ul class="nav navbar-nav">
+                    <li class="active"><a href="/">Home</a></li>
+                    <li><a href="/play/">Play!</a></li>
+                    <li><a href="/guide/">Guide</a></li>
+                  </ul>
+                  <ul class="nav navbar-nav navbar-right">
+                    <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+                    <li><a href="/logout">Sign Out</a></li>
+                    <% }else{ %>
+                    <li><a href="/login">Log In</a></li>
+                    <% } %>
+
+                    <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+                    <li><a href="/account">Your Account</a></li>
+                    <% }else{ %>
+                    <li><a href="/register">Register</a></li>
+                    <% } %>
+                    <li><a href="/help/">Help</a></li>
+                  </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="jumbotron">
+                    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+
+                        <ol class="carousel-indicators">
+                            <li data-target="myCarousel" data-slide-to="0" class="active"></li>
+                            <li data-target="myCarousel" data-slide-to="1"></li>
+                            <li data-target="myCarousel" data-slide-to="2"></li>
+                            <li data-target="myCarousel" data-slide-to="3"></li>
+                            <li data-target="myCarousel" data-slide-to="4"></li>
+                        </ol>
+
+                        <div class="carousel-inner">
+                            <div class="active item"><img src="/images/Smile.png" class="img-responsive img-rounded" alt="responsive image"></div>
+                            <div class="item"><img src="/images/Windy Mane Fluttershy.png" class="img-responsive img-rounded" alt="responsive image"></div>
+                            <div class="item"><img src="/images/Bacchus Punch.png" class="img-responsive img-rounded" alt="responsive image"></div>
+                            <div class="item"><img src="/images/The Death of Twilight Sparkle 2.png" class="img-responsive img-rounded" alt="responsive image"></div>
+                            <div class="item"><img src="/images/Portrait of Madame R.png" class="img-responsive img-rounded" alt="responsive image"></div>
+                        </div>
+
+                        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                        </a>
+                        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div style="background-color:rgb(28,30,34); border-radius: 5px; padding-left: 2px; padding-right: 2px; border: 1px solid rgb(11, 11, 13);">
+                    <a class="twitter-timeline" href="https://twitter.com/TorreySlattery" 
+                        data-widget-id="416485331064483840"
+                        data-chrome="transparent noscrollbar nofooter"
+                        data-border-color="#0B0B0D">
+                        Tweets by @TorreySlattery
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>   
+
+<script>
+    $(document).ready(function(){
+        // $(".jumbotron").draggable();
+        $(".carousel").carousel('cycle');
+    });
+</script>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+</html>
