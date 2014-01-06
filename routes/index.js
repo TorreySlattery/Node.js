@@ -2,16 +2,10 @@ module.exports = function Route(app){
 
     var pg = require('pg');
     var bcrypt = require('bcrypt-nodejs');
+    var account = require('./account');
 
     var mongoose = require('mongoose');
     var Schema = mongoose.Schema;
-    var db = mongoose.connection;
-
-    mongoose.connect('mongodb://localhost/test');
-    db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', function callback(){
-        // console.log("Yay!");
-    }); 
 
     var userSchema = new Schema({
         name: String,
@@ -21,24 +15,53 @@ module.exports = function Route(app){
     });
 
     var User = mongoose.model('User', userSchema);
+    //This will take the 'User' argument and create a MongoDB collection called 'users' from it
 
-    var john = new User({
-                        name: 'John',
-                        email: 'john@email.com',
-                        hash: 'myHash'
+    app.post('/process_registrationMG', function(req, res){
+        account.checkIfUserExistsMG(User, req.body['email'], function(err, result){
+            if(result){
+                req.flash('info', 'User already exists.');
+                res.redirect('/register');
+            }else{
+                var person = new User({
+                    name: req.body['name'],
+                    email: req.body['email'],
+                });
+                account.createHash(req.body['password'], function(err, hash_res){
+                    person.hash = hash_res;
+  
+                    account.saveUserMG(person, function(){
+                        console.log("Saved!");
+                    });
+                }); 
+                req.session.user_name = req.body['name'];
+                res.redirect('/');            
+            }
+        });
     });
 
-    // john.save(function(err){
-    //     if(err){
-    //         return console.log("There was an error: ", err);
-    //     }
-    //     console.log("Saved!");
-    // });
-
-    User.find({ name: 'John'}, function(err, person){
-        if(err) return console.log("There was a query error: ", err);
-        console.log('%s is %s with %s', 
-            person[0]['name'], person[0]['email'], person[0]['hash']);
+    app.post('/process_loginMG', function(req, res){
+        account.checkIfUserExistsMG(User, req.body['email'], function(err, result){
+            if(result){ //if yes, process the hash comparison, if match, redirect to /
+               bcrypt.compare(req.body['password'], result['hash'], function(err, bcrypt_res){
+                    if(err){
+                        return console.error('error comparing password.', err);
+                    }else{
+                        if(bcrypt_res){
+                            req.session.user_name = result['name'];
+                            res.redirect('/');
+                        }else{                            
+                            req.flash('info', 'Invalid password.');
+                            res.redirect('/login');
+                        }
+                    }
+                });
+                res.redirect('/login');
+            }else{ //if not, bounce the user back to /login with an error message
+                req.flash('info', 'That user does not exist.');
+                res.redirect('/login/');            
+            }
+        });
     });
 
     app.get('/', function(req, res){
@@ -74,10 +97,14 @@ module.exports = function Route(app){
     });
 
     app.get('/account', function(req, res){
-        res.render('account', {title: 'Your Account Page'
-                            , message: req.flash('info')
-                            , session: req.session
-                            });
+        if(typeof(req.session['user_name']) == "undefined"){
+            res.redirect('/login');
+        }else{
+            res.render('account', {title: 'Your Account Page'
+                                , message: req.flash('info')
+                                , session: req.session
+                                });
+        }
     });
 
     app.get('/register', function(req, res){
@@ -123,7 +150,7 @@ module.exports = function Route(app){
                     var name = req.body['name'];
                     var email = req.body['email'];
 
-                    createHash(req.body['password'], function(err, hash_res){
+                    account.createHash(req.body['password'], function(err, hash_res){
                         client.query("insert into users(name, email, hash, created_at) values($1, $2, $3, $4)", 
                                 [name, email, hash_res, "now()"], function (err, query_result) {
                             if(err){
@@ -163,47 +190,6 @@ module.exports = function Route(app){
         });
     });
 
-    function createHash(password, callback){
-        bcrypt.genSalt(10, function(err, salt){
-            bcrypt.hash(password, salt, null, function(err, hash){
-                if(err){
-                    return console.error('error hashing password.', err);
-                }else{
-                    return callback(err, hash);
-                }
-            });
-        });
-    };
-
-    function compareHash(password, hash){
-        bcrypt.compare(password, hash, function(err, res){
-            if(err){
-                return console.error('error comparing password.', err);
-            }else{
-                return res;
-            }
-       });
-    };
-
-    function checkIfUserExists(email, callback){
-        var conString = "postgres://postgres:postgres@localhost/mydb";
-
-        var client = new pg.Client(conString);
-
-        client.connect(function(err) {
-            if(err) {
-                return console.error('could not connect to postgres', err);
-            }
-
-            client.query("select * from users where email=$1", [email], function (err, result){
-                if(err){
-                    return console.error('Error running query: ', err);
-                }
-                callback(null, result.rows[0]); //if there's a match, this will be true
-                client.end();
-            });
-        });
-    };
     app.io.route("new_user", function(req){
         console.log("New user emit fired: ", req.data);
     });
