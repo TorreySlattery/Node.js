@@ -1,6 +1,8 @@
 module.exports = function Route(app){
 
     var pg = require('pg');
+
+
     var bcrypt = require('bcrypt-nodejs');
     var account = require('./account');
 
@@ -18,26 +20,35 @@ module.exports = function Route(app){
     //This will take the 'User' argument and create a MongoDB collection called 'users' from it
 
     app.post('/process_registrationMG', function(req, res){
-        account.checkIfUserExistsMG(User, req.body['email'], function(err, result){
-            if(result){
-                req.flash('info', 'User already exists.');
-                res.redirect('/register');
-            }else{
-                var person = new User({
-                    name: req.body['name'],
-                    email: req.body['email'],
-                });
-                account.createHash(req.body['password'], function(err, hash_res){
-                    person.hash = hash_res;
-  
-                    account.saveUserMG(person, function(){
-                        console.log("Saved!");
+        req.assert('email', 'A valid email is required').isEmail();
+        var errors = req.validationErrors();
+
+        if(errors){
+            req.flash('info', 'Invalid email.');
+           res.redirect('/register');
+        }else{
+
+            account.checkIfUserExistsMG(User, req.body['email'], function(err, result){
+                if(result){
+                    req.flash('info', 'User already exists.');
+                    res.redirect('/register');
+                }else{
+                    var person = new User({
+                        name: req.body['name'],
+                        email: req.body['email'],
                     });
-                }); 
-                req.session.user_name = req.body['name'];
-                res.redirect('/');            
-            }
-        });
+                    account.createHash(req.body['password'], function(err, hash_res){
+                        person.hash = hash_res;
+      
+                        account.saveUserMG(person, function(){
+                            console.log("Saved!");
+                        });
+                    }); 
+                    req.session.user_name = req.body['name'];
+                    res.redirect('/');            
+                }
+            });
+        }
     });
 
     app.post('/process_loginMG', function(req, res){

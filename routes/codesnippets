@@ -1,0 +1,76 @@
+        var conString = "postgres://postgres:postgres@localhost/mydb";
+
+        var client = new pg.Client(conString);
+
+        client.connect(function(err) {
+            if(err) {
+                return console.error('could not connect to postgres', err);
+            }
+            var name = req.data['name'];
+            var email = req.data['email'];
+
+            createHash(req.data['password'], function(err, res){
+                client.query("insert into users(name, email, hash, created_at) values($1, $2, $3, $4)", 
+                        [name, email, res, "now()"], function (err, result) {
+                    if(err){
+                        return console.error('error running query', err);
+                        //TODO: If there's an error, bounce the user back to registration with a list of what's wrong.
+                    }
+                    client.end();
+                });
+            });
+        });
+
+
+
+
+        $(document).ready(function(){
+    var canvas;
+    var ctx;
+     
+    var background;
+    var width = 300;
+    var height = 200;
+
+    var cloud;
+    var cloud_x;
+     
+    function init() {
+      canvas = document.getElementById("cloud_demo_canvas");
+      width = canvas.width;
+      height = canvas.height;
+      ctx = canvas.getContext("2d");
+     
+      // init background 
+      background = new Image();
+      background.src = 'http://silveiraneto.net/wp-content/uploads/2011/06/forest.png';
+     
+      // init cloud
+      cloud = new Image();
+      cloud.src = 'http://silveiraneto.net/wp-content/uploads/2011/06/cloud.png';
+      cloud.onload = function(){
+        cloud_x = -cloud.width;
+      };
+     
+      return setInterval(main_loop, 10);
+    }
+     
+    function update(){
+      cloud_x += 0.3;
+      if (cloud_x > width ) {
+        cloud_x = -cloud.width;
+      }
+    }
+     
+    function draw() {
+      ctx.drawImage(background,0,0);
+      ctx.drawImage(cloud, cloud_x, 0);
+    }
+     
+    function main_loop() {
+      draw();
+      update();
+    }
+     
+    init();
+});

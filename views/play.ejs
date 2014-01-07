@@ -6,6 +6,7 @@
     <script src='/javascripts/jquery-2.0.3.min.js'></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src='/javascripts/bootstrap.min.js'></script>
+    <script src='/javascripts/game.js'></script>
     
     
   </head>
@@ -43,63 +44,16 @@
           </ul>
         </div><!--/.nav-collapse -->
       </div>
-      <div id="playField" class="jumbotron">
-        <canvas id="cloud_demo_canvas" width="640" height="480">Alternative text if browser don't support canvas.</canvas>
-
+      <!-- <div class="col-md-2"> -->
+      <div id="playField" class="jumbotron col-md-12">
+        <canvas id="myCanvas" width="1000" height="600" tabindex="1">Alternative text if browser don't support canvas.</canvas>
       </div>
+      <!-- <div class="col-md-2"> -->
     </div>
 </body>   
 
 <script>
-var canvas;
-var ctx;
- 
-var background;
-var width = 300;
-var height = 200;
 
-var cloud;
-var cloud_x;
- 
-function init() {
-  canvas = document.getElementById("cloud_demo_canvas");
-  width = canvas.width;
-  height = canvas.height;
-  ctx = canvas.getContext("2d");
- 
-  // init background 
-  background = new Image();
-  background.src = 'http://silveiraneto.net/wp-content/uploads/2011/06/forest.png';
- 
-  // init cloud
-  cloud = new Image();
-  cloud.src = 'http://silveiraneto.net/wp-content/uploads/2011/06/cloud.png';
-  cloud.onload = function(){
-    console.log("On load called.");
-    cloud_x = -cloud.width;
-  };
- 
-  return setInterval(main_loop, 10);
-}
- 
-function update(){
-  cloud_x += 0.3;
-  if (cloud_x > width ) {
-    cloud_x = -cloud.width;
-  }
-}
- 
-function draw() {
-  ctx.drawImage(background,0,0);
-  ctx.drawImage(cloud, cloud_x, 0);
-}
- 
-function main_loop() {
-  draw();
-  update();
-}
- 
-init();
 
 //Unrelated to the above code, but worth reading
 //http://jlongster.com/Making-Sprite-based-Games-with-Canvas
