@@ -6,7 +6,6 @@ $(document).ready(function(){
   var ctx = c.getContext('2d');
 
   var keysDown = {};
-  var staticDrawables = [];
   var animateDrawables = {};
   var lastGoodX = 0;
   var lastGoodY = 0;
@@ -44,6 +43,7 @@ $(document).ready(function(){
     }
 
     sm.load('tree', '/images/tree.png');
+    sm.load('rock', '/images/rock.png');
 
     sm.load('player1_n', '/images/player1_n.png');
     sm.load('player1_e', '/images/player1_e.png');
@@ -90,7 +90,7 @@ $(document).ready(function(){
       for (var k=0; k<maze[0].length; k++){
         switch(maze[i][k]){ //in case we want more than one barrier type
           case 5:
-            addStatic('tree', k*spacingX, i*spacingY, 40, 40);
+            add2dStatic('tree', k*spacingX, i*spacingY, 40, 40, i, k);
             break;
         }
       }
@@ -99,14 +99,13 @@ $(document).ready(function(){
     requestAnimationFrame(update);
   }
 
-  function addStatic(name, x, y, width, height){
-    staticDrawables.push({
-                      name: name,
-                      x: x,
-                      y: y,
-                      width: width,
-                      height: height,
-                    });
+  function add2dStatic(name, x, y, width, height, indexX, indexY){
+    static2d[indexX][indexY] = {name: name,
+                                x: x,
+                                y: y,
+                                width: width,
+                                height: height
+    };
   }
 
   function addDrawables(name, x, y, width, height, refName, collection, direction){
@@ -129,7 +128,11 @@ $(document).ready(function(){
                                             //If A's bottom is above B's top
                                             this.y+this.height <= collidable.y);
                                   },
-                                  dir: myDirection //1N 2E 3S 4W
+                                  dir: myDirection, //1N 2E 3S 4W
+                                  //Animation TODO
+                                  //anim: arrayOfStringNames,
+                                  //animIndex: 0,
+                                  //animStepSize: 1.0
                                 }
   }
 
@@ -298,20 +301,48 @@ $(document).ready(function(){
     return false;
   }
 
-  function checkStaticCollisions(collidable1){
-    for (var k in staticDrawables){
-      if(collidable1.intersects(staticDrawables[k])){
-        return true;
+  function checkStaticCollisions(collidable){
+    // var count = 0;
+
+    //Brute force method.
+    // for (var i in static2d){
+    //   for (var k in static2d[i]){
+    //     count++;
+    //     if(static2d[i][k]){
+    //       if(collidable.intersects(static2d[i][k])){
+    //         return true;
+    //       }
+    //     }
+    //   }
+    // }
+
+    var rect = contains(static2d, 0, 0, static2d[0].length-1, static2d.length-1, collidable);
+    //Binary search algorithm, cobbled together with spit and glue. 
+    for (var x=rect.startX; x<rect.endX+1; x++){
+      for (var y=rect.startY; y<rect.endY+1; y++){
+        count++;
+        if(static2d[y][x]){
+          if(collidable.intersects(static2d[y][x])){
+            return true;
+          }
+        }
       }
     }
+    $("title").html(count);
+    count = 0;
+
+    // console.log(rect);
+
     return false;
   }
 
   function draw(){
     drawBG();
 
-    for (var k in staticDrawables){
-      sm.draw(staticDrawables[k]['name'], staticDrawables[k]['x'], staticDrawables[k]['y']);
+    for (var i in static2d){
+      for (var k in static2d[i]){
+        sm.draw(static2d[i][k]['name'], static2d[i][k]['x'], static2d[i][k]['y']);
+      }
     }
 
     for (var k in animateDrawables){
@@ -328,4 +359,7 @@ $(document).ready(function(){
       ctx.fill();
     }
   }
+
+  // console.log("Contains result: ", contains(static2d, 0, 0, static2d[0].length-1, static2d.length-1, animateDrawables['player1']));
+
 });

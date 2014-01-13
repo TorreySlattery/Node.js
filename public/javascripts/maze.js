@@ -7,6 +7,16 @@ for (var row=0; row<15; row++){
   maze.push(thisRow);
 }
 
+var static2d = [];
+
+for (var row=0; row<15; row++){
+  var thisRow = [];
+  for (var col=0; col<25; col++){
+    thisRow.push(0); //To initialize an empty 25x15 array
+  }
+  static2d.push(thisRow);
+}
+
 function carve_passages_from(cx, cy, grid){
   var directions = [1, 2, 3, 4]; //N, E, S, W
   directions = shuffle(directions);
