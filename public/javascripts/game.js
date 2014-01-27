@@ -149,8 +149,14 @@ $(document).ready(function(){
     }
 
     for (var k in bullets){
-      if(checkBorders(bullets[k]) || checkStaticCollisions(bullets[k])){
+      if(checkBorders(bullets[k])){
         delete bullets[k];
+      }else{
+        var collidedWith = checkStaticCollisions(bullets[k]);
+        if(collidedWith){
+          delete bullets[k];
+          static2d[collidedWith[0]][collidedWith[1]] = 0;
+        }
       }
     }
 
@@ -323,15 +329,14 @@ $(document).ready(function(){
         count++;
         if(static2d[y][x]){
           if(collidable.intersects(static2d[y][x])){
-            return true;
+            var coords = [y,x]
+            return coords;
           }
         }
       }
     }
-    $("title").html(count);
-    count = 0;
 
-    // console.log(rect);
+    // $("title").html(dt);
 
     return false;
   }

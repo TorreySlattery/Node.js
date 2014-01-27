@@ -2,13 +2,7 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
-    <script src='/javascripts/jquery-2.0.3.min.js'></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script src='/javascripts/bootstrap.min.js'></script>
-    <script src='/javascripts/game.js'></script>
-    
-    
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />    
   </head>
   <body>
     <div class="container">
@@ -20,7 +14,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">Hold Fast!</a>
+          <a class="navbar-brand" href="/">Node Tanks</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -46,12 +40,19 @@
       </div>
       <!-- <div class="col-md-2"> -->
       <div id="playField" class="jumbotron col-md-12">
-        <canvas id="myCanvas" width="1000" height="600" tabindex="1">Alternative text if browser don't support canvas.</canvas>
+        <!--<canvas id="bgCanvas" width="1000" height="600" style="position: absolute; z-index: 1"></canvas>-->
+        <canvas id="myCanvas" width="1000" height="600" tabindex="1" style="z-index: 2">Alternative text if browser don't support canvas.</canvas>
+
       </div>
       <!-- <div class="col-md-2"> -->
     </div>
 </body>   
+<script src='/javascripts/jquery-2.0.3.min.js'></script>
 
+<script src='/javascripts/bootstrap.min.js'></script>
+<script src='/javascripts/maze.js'></script>
+<script src='/javascripts/misc.js'></script>
+<script src='/javascripts/game.js'></script>
 <script>
 
 
