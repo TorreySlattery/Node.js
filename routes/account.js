@@ -1,17 +1,6 @@
 var bcrypt = require('bcrypt-nodejs');
 
 var mongoose = require('mongoose');
-// var Schema = mongoose.Schema;
-// var db = mongoose.connection;
-
-// var userSchema = new Schema({
-//     name: String,
-//     email: { type: String, unique: true },
-//     hash: String,
-//     created_at: { type: Date, default: Date.now },
-// });
-
-// var User = mongoose.model('User', userSchema);
 
 exports.checkIfUserExistsMG = function(model, email, callback){
     var db = mongoose.connection;
@@ -58,7 +47,7 @@ exports.compareHash = function(password, hash){
    });
 };
 
-exports.checkIfUserExists = function(email, callback){
+exports.checkIfUserExistsPG = function(email, callback){
     var conString = "postgres://postgres:postgres@localhost/mydb";
 
     var client = new pg.Client(conString);

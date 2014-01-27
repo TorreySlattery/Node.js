@@ -2,12 +2,13 @@ module.exports = function Route(app){
 
     var pg = require('pg');
 
-
     var bcrypt = require('bcrypt-nodejs');
     var account = require('./account');
 
     var mongoose = require('mongoose');
     var Schema = mongoose.Schema;
+
+    var match = require('./match')(app);
 
     var userSchema = new Schema({
         name: String,
@@ -76,21 +77,21 @@ module.exports = function Route(app){
     });
 
     app.get('/', function(req, res){
-        res.render('index', {title:'Hold Fast!'
+        res.render('index', {title:'Node Tanks'
                             , message: req.flash('info')
                             , session: req.session
                             });
     });
 
     app.get('/guide', function(req, res){
-        res.render('guide', {title:'Hold Fast! Game Guide'
+        res.render('guide', {title:'Node Tanks Game Guide'
                             , message: req.flash('info')
                             , session: req.session
                             });
     });
 
     app.get('/play', function(req, res){
-        res.render('play', {title:'Play Hold Fast!'
+        res.render('play', {title:'Play Node Tanks'
                                 , message: req.flash('info')
                                 , session: req.session
                                 });
@@ -100,7 +101,7 @@ module.exports = function Route(app){
         if(typeof(req.session['user_name']) != "undefined"){
             res.redirect('/account');
         }else{
-            res.render('login', {title:'Hold Fast! Login'
+            res.render('login', {title:'Node Tanks Login'
                                 , message: req.flash('info')
                                 , session: req.session
                                 });
@@ -119,14 +120,14 @@ module.exports = function Route(app){
     });
 
     app.get('/register', function(req, res){
-        res.render('register', {title:'Hold Fast! Registration Page'
+        res.render('register', {title:'Node Tanks Registration Page'
                                  , message: req.flash('info')
                                  , session: req.session
                                 });
     });
 
     app.get('/help', function(req, res){
-        res.render('help', {title:'Hold Fast! Help Page'
+        res.render('help', {title:'Node Tanks Help Page'
                                 , message: req.flash('info')
                                 , session: req.session
                                 });
@@ -142,8 +143,8 @@ module.exports = function Route(app){
     });
 
 
-    app.post('/process_registration', function(req, res){
-        checkIfUserExists(req.body['email'], function(err, result){
+    app.post('/process_registrationPG', function(req, res){
+        account.checkIfUserExistsPG(req.body['email'], function(err, result){
             if(result){ //If user exists, registration fails
                 req.flash('info', 'User already exists.');
                 res.redirect('/register');
@@ -177,8 +178,8 @@ module.exports = function Route(app){
         });
     });
 
-    app.post('/process_login', function(req, res){
-        checkIfUserExists(req.body['email'], function(err, result){
+    app.post('/process_loginPG', function(req, res){
+        account.checkIfUserExistsPG(req.body['email'], function(err, result){
             if(result){ //if user exists, check to see if the credentials work
                 bcrypt.compare(req.body['password'], result['hash'], function(err, bcrypt_res){
                     if(err){
@@ -205,8 +206,8 @@ module.exports = function Route(app){
         console.log("New user emit fired: ", req.data);
     });
 
-    app.io.route('disconnect', function(req){
-        // console.log("Client disconnected.", req.sessionID);
-        req.io.broadcast('disconnect', {id: req.sessionID});
-    });
+    // app.io.route('disconnect', function(req){
+    //     // console.log("Client disconnected.", req.sessionID);
+    //     req.io.broadcast('disconnect', {id: req.sessionID});
+    // });
 }
