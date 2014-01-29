@@ -201,6 +201,19 @@ $.getScript("/socket.io/socket.io.js", function(){
           static2d[collidedWith[0]][collidedWith[1]] = 0;
         }
       }
+      if(animateDrawables['player1'] && bullets[k]){
+        if(bullets[k].intersects(animateDrawables['player1'])){
+          delete bullets[k];
+          console.log("Player 1 shot.")
+        }
+      }
+      if(animateDrawables['player2'] && bullets[k]){
+        if(bullets[k].intersects(animateDrawables['player2'])){
+          delete bullets[k];
+          console.log("Player 2 shot.")
+          io.emit('i_got_shot', 'player2')
+        }
+      }
     }
 
     draw();
@@ -305,7 +318,7 @@ $.getScript("/socket.io/socket.io.js", function(){
     switch(player.dir){
       case 1:
         x = player.x + player.width/2 - bulletWidth/2;
-        y = player.y;
+        y = player.y - bulletHeight;
         addDrawables('bullet_n', 
               x, 
               y, 
@@ -316,7 +329,7 @@ $.getScript("/socket.io/socket.io.js", function(){
               player.dir);
         break;
       case 2:
-        x = player.x + player.width;
+        x = player.x + player.width + bulletWidth;
         y = player.y + player.height/2 - bulletHeight/2;
         addDrawables('bullet_e', 
               x, 
@@ -329,7 +342,7 @@ $.getScript("/socket.io/socket.io.js", function(){
         break;
       case 3:
         x = player.x + player.width/2 - bulletWidth/2;
-        y = player.y + player.height;
+        y = player.y + player.height + bulletHeight;
         addDrawables('bullet_s', 
               x, 
               y, 
@@ -340,7 +353,7 @@ $.getScript("/socket.io/socket.io.js", function(){
               player.dir);
         break;
       case 4:
-        x = player.x;
+        x = player.x - bulletWidth;
         y = player.y + player.height/2 - bulletHeight/2;
         addDrawables('bullet_w', 
               x, 

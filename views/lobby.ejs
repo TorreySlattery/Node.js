@@ -24,7 +24,6 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
-            <li><a href="/play/">Play!</a></li>
             <li><a href="/guide/">Guide</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -39,7 +38,7 @@
             <% }else{ %>
             <li><a href="/register">Register</a></li>
             <% } %>
-            <li class="active"><a href="/help/">Help</a></li>
+            <li class="active"><a href="/lobby/">Lobby</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -84,7 +83,11 @@
         $("#user-create-btn").html(data.user_name + " joined your game!")
       });
 
-      //TODO: Change a matched game's lobby text to "In progress" and the button from Join to "Spectate"
+      io.on('update_lobby', function(data){
+        console.log("Received an update lobby call from the server.")
+        showAllGames(data)
+      });
+
 
       io.on('go_play', function(data){
         window.location.href = '/play'
@@ -97,9 +100,14 @@
                         <div class='thumbnail'>\
                           <img src='/images/grass.jpg' alt='...'>\
                           <div class='caption'>\
-                            <h3>" + data[game].user_name + "'s Game</h3>\
-                            <p>Waiting for a partner...</p>\
-                            <p><button class='btn btn-primary' role='button' game-id='" + data[game].email + "'>Join Game!</button></p>\
+                            <h3>" + data[game].user_name + "'s Game</h3>"
+                            if(data[game].inProgress){
+                              html += "<p>Game in progress!</p>"
+                            }else{
+                              html += "<p>Waiting for a partner...</p>"
+                              html += "<p><button class='btn btn-primary' role='button' game-id='" + data[game].email + "'>Join Game!</button></p>"
+                            }
+                          html += "\
                           </div>\
                         </div>\
                       </div>";

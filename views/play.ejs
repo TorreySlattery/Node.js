@@ -19,7 +19,6 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
-            <li class="active"><a href="/play/">Play!</a></li>
             <li><a href="/guide/">Guide</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -34,17 +33,32 @@
             <% }else{ %>
             <li><a href="/register">Register</a></li>
             <% } %>
-            <li><a href="/help/">Help</a></li>
+            <li><a href="/lobby/">Lobby</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
-      <!-- <div class="col-md-2"> -->
       <div id="playField" class="jumbotron col-md-12">
-        <!--<canvas id="bgCanvas" width="1000" height="600" style="position: absolute; z-index: 1"></canvas>-->
-        <canvas id="myCanvas" width="1000" height="600" tabindex="1" style="z-index: 2">Alternative text if browser don't support canvas.</canvas>
+        <div style="display:inline;" class="col-md-4">
+          <span class="glyphicon glyphicon-circle-arrow-up"><br>W</span>
+          <span class="glyphicon glyphicon-circle-arrow-left"><br>A</span>
+          <span class="glyphicon glyphicon-circle-arrow-down"><br>S</span>
+          <span class="glyphicon glyphicon-circle-arrow-right"><br>D</span>
+          <span class="glyphicon glyphicon-move"><br>Space</span>
+        </div>
+        <style>#scoreboard div{display: inline;}</style>
+        <div id="scoreboard" class="col-md-4">
+          <div>Player 1: </div>
+          <div id="player1-score"> 0 </div>
+          <div style="border:2px solid rgb(128,128,128)"></div>
+          <div>Player 2: </div>
+          <div id="player2-score"> 0 </div>
 
+        </div>
+        <div class="col-md-4"></div>
+        <div>
+          <canvas id="myCanvas" width="1000" height="600" tabindex="1" style="z-index: 2">Alas, your browser does not support HTML5 canvas and thus won't be able to play this game!</canvas>
+        </div>
       </div>
-      <!-- <div class="col-md-2"> -->
     </div>
 </body>   
 <script src='/javascripts/jquery-2.0.3.min.js'></script>
@@ -58,6 +72,14 @@
 
 <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
   $(document).ready(function(){
+    alert("\
+    W - Move up \n\
+    A - Move left \n\
+    S - Move down \n\
+    D - Move right \n\
+    Space - Throw shuriken \n\
+    Note: You're using active camouflage! You're invisible to the enemy at the start until you move.\n\
+    Also: The game won't start until both players click OK.")
     io = io.connect()
 
     user_info = {user_name: '<%= session['user_name'] %>', email: '<%= session['email'] %>'}
@@ -96,6 +118,33 @@
           window.updateEnemy(data)
         })
       })
+    })
+
+    var gameOver = false
+    io.on('update_score', function(data){
+      if(data == "player1"){
+        var currentScore = parseInt($("#player2-score").html())
+        currentScore++
+        if(currentScore>9 && !gameOver){
+          gameOver = !gameOver
+          io.emit('end_game')
+          alert("Player 2 wins!\nPress OK to return to the lobby.")
+          window.location.href = '/lobby'
+        }else{
+          $("#player2-score").html(currentScore)
+        }
+      }else{
+        var currentScore = parseInt($("#player1-score").html())
+        currentScore++
+        if(currentScore>9 && !gameOver){
+          gameOver = !gameOver
+          io.emit('end_game')
+          alert("Player 1 wins!\nPress OK to return to the lobby.")
+          window.location.href = '/lobby'
+        }else{
+          $("#player1-score").html(currentScore)
+        }
+      }
     })
 
   })
