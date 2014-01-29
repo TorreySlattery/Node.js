@@ -44,95 +44,88 @@
         </div><!--/.nav-collapse -->
       </div>
 
-      <div class="jumbotron">
-        <div id="lobby">
-        </div>
-        <div id="games">
+
+      <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+      <div class="container">
+        <div><button id="user-create-btn" class="col-sm-12 col-md-12 btn btn-default" enabled>Click here to start your own game!</button></div>
+        <div id="games" class="row">
         </div>
       </div>
-      <div>
-        This is temporarily the test section.
-        <button id="create">CREATE</button>
-        <button id="join">JOIN</button>
-      </div>
+      <% } else{ %>
+        <div class="col-md-4"></div><div class="alert alert-danger col-md-4">You must be logged in to create or join a game.</div><div class="col-md-4"></div>
+      <% } %>
     </div>
 </body>   
 
 <script>
+  <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
     $(document).ready(function(){
       io = io.connect(); 
+      user_info = {user_name: '<%= session['user_name'] %>', email: '<%= session['email'] %>'}
 
-      io.emit('join_lobby', {id: "test_user_email"});
+      io.emit('joined_lobby', user_info);
 
-      io.on('user_joined_lobby', function(data){
-        console.log("User joined the lobby.")
-        console.log(data.usersInLobby)
-        listUsers(data.usersInLobby)
-      })
-
-      io.on('user_left_lobby', function(data){
-        console.log("User left the lobby.")
-        console.log(data.usersInLobby)
-        listUsers(data.usersInLobby)
-      })
-
-      io.on('pick_a_new_name', function(data){
-
+      io.on('new_game_ack', function(data){
+        console.log("Server has acknowledged the new game request.");
+        console.log(data) //<--Should be the session data of the current user
       });
 
-      io.on('too_slow', function(data){
-        //Display a message saying that that game is already full.
+      io.on('show_current_games', function(data){
+        console.log("New user entered the lobby. Server is sending a list of existing games: ", data)
+        showAllGames(data)
       });
 
-      io.on('game_room_ready', function(data){
-        io.emit('give_us_a_map', {id: "#####Game Name here"});
+      io.on('new_game_waiting', function(data){
+        console.log("Someone made a new game.");
+        showAllGames(data)
       });
 
-      io.on('new_game_created', function(data){
-        console.log("Someone else created a new game. Update the list of users to add a Join button beside the appropriate one.")
-
-        console.log(data)
+      io.on('game_matched', function(data){
+        $("#user-create-btn").html(data.user_name + " joined your game!")
       });
 
-      $("#create").click(function(){
-        io.emit('create_game', {id: 'test_user_email'});
-        //grey the button out or make it vanish until the game is done, cancelled, or the create request fails
-        $("#create").attr("disabled", true)
+      //TODO: Change a matched game's lobby text to "In progress" and the button from Join to "Spectate"
+
+      io.on('go_play', function(data){
+        window.location.href = '/play'
       });
 
-      $("#join").click(function(){
-        io.emit('join_game', {id: 'test_user_email'});
-      });
-
-      //Takes an object with SessionID: true/false pairings. True means they're looking for a partner for a game.
-      io.on('update_your_users', function(data){
-        $("#lobby").html(function(){
-          var html = "";
-          for (var user in data){
-            html += user
-            if(data[user]){
-              html += " " + "<button id='" + user + "'>Join Game</button>"
-            }
-            html += "<br/>"
-          }
-          return html
-        })
-      })
-
-      function listUsers(users_list){
-        $("#lobby").html(function(){
-          var html = "";
-          for(var user in users_list){
-            html += users_list[user] + "<br>"
-          }
-          return html;
-        })
+      function showAllGames(data){
+        $("#games").html("")
+        for(var game in data){
+          var html = "<div class='col-sm-6 col-md-3'>\
+                        <div class='thumbnail'>\
+                          <img src='/images/grass.jpg' alt='...'>\
+                          <div class='caption'>\
+                            <h3>" + data[game].user_name + "'s Game</h3>\
+                            <p>Waiting for a partner...</p>\
+                            <p><button class='btn btn-primary' role='button' game-id='" + data[game].email + "'>Join Game!</button></p>\
+                          </div>\
+                        </div>\
+                      </div>";
+          $("#games").append(html)
+          var g = "[game-id='" + data[game].email + "']"
+          $(g).click(function(){
+            io.emit("i_want_to_join", {
+              gameID: $(this).attr('game-id'),
+              iam: user_info
+              });
+          });
+        }
       }
-    });
+
+      $("#user-create-btn").attr("user-id", '<%= session['email'] %>')
+      $("#user-create-btn").click(function(){
+        io.emit("create_game_for", user_info)
+        $("#user-create-btn").attr("disabled", true)
+        $("#user-create-btn").html("Waiting for someone to join your game...")
+      })
+    })
+  <% } %>
 </script>
-<style>
-#games, #lobby{
-  display: inline-block;
-}
-</style>
+<% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+
+<% } else{ %>
+
+<% } %>
 </html>

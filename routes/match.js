@@ -1,75 +1,74 @@
 module.exports = function Match(app){
 
-  var games = {};
-  var lobbyUsers ={};
+  var maze = require('../public/javascripts/maze_s.js')
 
-  function Game(id){
-    this.id = id;
-    this.players = 1
-  }
+  lobbyUsers = {};
+  games = {};
+  belongs_to = {}; //I trid storing which game each user belongs to in their session variable, but it wasn't being preserved between page redirects
+  checkins = {}; //gameID: players_checked_in
 
-  app.io.route('join_lobby', function(req){
-    req.io.join('lobby');
-    lobbyUsers[req.sessionID] = req.sessionID;
-
-    app.io.room('lobby').broadcast('user_joined_lobby', {
-      usersInLobby: lobbyUsers
-    })
+  app.io.route('joined_lobby', function(req){
+    console.log(req.data.email + " joined the lobby.");
+    req.io.join('lobby')
+    lobbyUsers[req.data.email] = req.data.email
+    req.io.emit('show_current_games', games);
   });
 
-  //User clicks the "Create Game" button
-  app.io.route('create_game', function(req){
+  app.io.route('create_game_for', function(req){
+    console.log("New game requested for user: ", req.data);
 
-    // var game = new Game(req.data.id)
+    games[req.data.email] = req.data
+    belongs_to[req.data.email] = req.data.email
+    req.io.join(req.data.email)
+    req.io.room('lobby').broadcast('new_game_waiting', games)
+    req.io.emit('new_game_ack', req.session);
+  });
 
-    // if(games[game.id]){
-    //   console.log("Game name was in use already.");
-    //   req.io.emit('pick_a_new_name', {});
-    // }else{
-    //   console.log("Creating a new game...");
-    //   games[game.id]  = game
-    //   req.io.join(game.id);
-    //   //Todo: on success, send the user to Play with a "Waiting for players to join..." message and an option to cancel.
-    //   req.io.room('lobby').broadcast('new_game_created', {
-    //     req.data.id: req.data.id
-    //   });
-    // }
+  app.io.route('i_want_to_join', function(req){
+    console.log("Join game requested: ", req.data);
+    belongs_to[req.data.iam.email] = req.data.gameID
+    req.io.join(req.data.gameID);
+    req.io.room(req.data.gameID).broadcast('game_matched', req.data.iam);
+    app.io.room(req.data.gameID).broadcast('go_play', req.data.gameID)
+  });
 
-    var game = new Game(req.sessionID)
-    console.log("New game requested for sessionID: ", game.id)
+  app.io.route('checking_in', function(req){
+    console.log("User checking in after page redirect.")
+    console.log("Belongs to: ", belongs_to[req.data.email])
+    var gameID = belongs_to[req.data.email]
 
-    if(games[game.id]){
-      console.log("Game name was in use already.");
-      req.io.emit('pick_a_new_name', {});
+    req.io.join(gameID)
+    req.io.emit('checking_in_ack')
+
+    if(checkins[gameID]){
+      console.log("Both users checked in for gameID: " + gameID + ". Server generating a maze to send to the clients.")
+      var x = Math.floor(Math.random()*24)
+      var y = Math.floor(Math.random()*14)
+      var map = maze.generateMaze(x, y)
+
+      req.io.room(gameID).broadcast('you_are_player1', map)
+      req.io.emit('you_are_player2', map)
     }else{
-      console.log("Creating a new game...");
-      games[game.id]  = game.id
-      req.io.join(game.id);
-      //Todo: on success, send the user to Play with a "Waiting for players to join..." message and an option to cancel.
-      req.io.room('lobby').broadcast('new_game_created', game.id);
-      app.io.room('lobby').broadcast('update_your_users', games);
+      console.log("First user checked in.")
+      checkins[gameID] = 1
     }
-
   });
 
-  app.io.route('join_game', function(req){
-    
-    if(games[req.data.id].players <2){
-      games[req.data.id].players++;
-      console.log("Joining room: ", games[req.data.id]);
-      req.io.join(req.data.id)
-      app.io.room('lobby').broadcast('game_filled', {
-        id: req.data.id
-      });
-      req.io.room(req.data.id).broadcast('game_room_ready', {});
-    }else{
-      console.log("User was too slow to join room: ", games[req.data.id]);
-      req.io.emit('too_slow', {});
+  app.io.route("created_a_bullet", function(req){
+    var gameID = belongs_to[req.session.email]
+    if(gameID){
+      req.io.room(gameID).broadcast('bullet_created', req.data);
+    }
+  });
+
+  app.io.route("my_current_position", function(req){
+    var gameID = belongs_to[req.session.email]
+    if(gameID){
+      req.io.room(gameID).broadcast('update_your_enemy', req.data)
     }
   });
 
   app.io.route('disconnect', function(req){
-    // lobbyUsers[req.sessionID] = false;
     delete lobbyUsers[req.sessionID];
     app.io.room('lobby').broadcast('user_left_lobby', {
       usersInLobby: lobbyUsers

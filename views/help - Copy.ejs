@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <script src='/javascripts/jquery-2.0.3.min.js'></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src='/javascripts/bootstrap.min.js'></script>
+    <script src="/socket.io/socket.io.js"></script>
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Node Tanks</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/play/">Play!</a></li>
+            <li><a href="/guide/">Guide</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+            <li><a href="/logout">Sign Out</a></li>
+            <% }else{ %>
+            <li><a href="/login">Log In</a></li>
+            <% } %>
+
+            <% if((typeof(session) != "undefined") && (typeof(session['user_name']) != "undefined")){ %>
+            <li><a href="/account">Your Account</a></li>
+            <% }else{ %>
+            <li><a href="/register">Register</a></li>
+            <% } %>
+            <li class="active"><a href="/help/">Help</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+
+      <div class="jumbotron">
+        <div id="lobby">
+        </div>
+        <div id="games">
+        </div>
+      </div>
+      <div>
+        This is temporarily the test section.
+        <button id="create">CREATE</button>
+        <button id="join">JOIN</button>
+      </div>
+    </div>
+</body>   
+
+<script>
+    $(document).ready(function(){
+      io = io.connect(); 
+
+      //Stash test.
+
+      io.emit('join_lobby', {id: "test_user_email"});
+
+      io.on('user_joined_lobby', function(data){
+        console.log("User joined the lobby.")
+        console.log(data.usersInLobby)
+        listUsers(data.usersInLobby)
+      })
+
+      io.on('user_left_lobby', function(data){
+        console.log("User left the lobby.")
+        console.log(data.usersInLobby)
+        listUsers(data.usersInLobby)
+      })
+
+      io.on('pick_a_new_name', function(data){
+
+      });
+
+      io.on('too_slow', function(data){
+        //Display a message saying that that game is already full.
+      });
+
+      io.on('game_room_ready', function(data){
+        io.emit('give_us_a_map', {id: "#####Game Name here"});
+      });
+
+      io.on('new_game_created', function(data){
+        console.log("Someone else created a new game. Update the list of users to add a Join button beside the appropriate one.")
+
+        console.log(data)
+      });
+
+      $("#create").click(function(){
+        io.emit('create_game', {id: 'test_user_email'});
+        //grey the button out or make it vanish until the game is done, cancelled, or the create request fails
+        $("#create").attr("disabled", true)
+      });
+
+      $("#join").click(function(){
+        io.emit('join_game', {id: 'test_user_email'});
+      });
+
+      //Takes an object with SessionID: true/false pairings. True means they're looking for a partner for a game.
+      io.on('update_your_users', function(data){
+        $("#lobby").html(function(){
+          var html = "";
+          for (var user in data){
+            html += user
+            if(data[user]){
+              html += " " + "<button id='" + user + "'>Join Game</button>"
+            }
+            html += "<br/>"
+          }
+          return html
+        })
+      })
+
+      function listUsers(users_list){
+        $("#lobby").html(function(){
+          var html = "";
+          for(var user in users_list){
+            html += users_list[user] + "<br>"
+          }
+          return html;
+        })
+      }
+    });
+</script>
+<style>
+#games, #lobby{
+  display: inline-block;
+}
+</style>
+</html>

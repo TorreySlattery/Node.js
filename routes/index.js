@@ -11,7 +11,7 @@ module.exports = function Route(app){
     var match = require('./match')(app);
 
     var userSchema = new Schema({
-        name: String,
+        name: { type: String, unique: true },
         email: { type: String, unique: true },
         hash: String,
         created_at: { type: Date, default: Date.now },
@@ -25,7 +25,7 @@ module.exports = function Route(app){
         var errors = req.validationErrors();
 
         if(errors){
-            req.flash('info', 'Invalid email.');
+            req.flash('info', errors);
            res.redirect('/register');
         }else{
 
@@ -45,6 +45,7 @@ module.exports = function Route(app){
                             console.log("Saved!");
                         });
                     }); 
+                    req.session.email = req.body['email'];
                     req.session.user_name = req.body['name'];
                     res.redirect('/');            
                 }
@@ -61,6 +62,7 @@ module.exports = function Route(app){
                     }else{
                         if(bcrypt_res){
                             req.session.user_name = result['name'];
+                            req.session.email = result['email'];
                             res.redirect('/');
                         }else{                            
                             req.flash('info', 'Invalid password.');
