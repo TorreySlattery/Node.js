@@ -1,0 +1,31 @@
+        if(contains(  staticsArray,  //SE
+                                Math.floor(endX/2)+1, 
+                                Math.floor(endY/2)+1, 
+                                endX, 
+                                endY, 
+                                collidable)){
+        }else
+        if(contains( staticsArray, //NW
+                                startX, 
+                                startY, 
+                                Math.floor(endX/2), 
+                                Math.floor(endY/2), 
+                                collidable)){
+        }else if(contains(  staticsArray, //NE
+                                Math.floor(endX/2)+1, 
+                                startY, 
+                                endX, 
+                                Math.floor(endY/2), 
+                                collidable)){
+        }else if(contains(  staticsArray, //SW
+                                startX, 
+                                Math.floor(endY/2)+1, 
+                                Math.floor(endX/2), 
+                                endY, 
+                                collidable)){
+        // }else if(contains(  staticsArray, 
+        //                         Math.floor(endX/2)+1, 
+        //                         Math.floor(endY/2)+1, 
+        //                         endX, 
+        //                         endY, 
+        //                         collidable)){

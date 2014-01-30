@@ -1,0 +1,252 @@
+$(document).ready(function(){
+
+  var lastTime;
+  var c = document.getElementById("myCanvas");
+  var ctx = c.getContext('2d');
+  var keysDown = {};
+
+  //img: image
+  //sx x coordnate where to start clipping
+  //sy y coordinate whre to start clipping
+  //swidth width of the clipped image
+  //sheight height of the clipped image
+  //x the x coordinate where to place the image on the canvas
+  //y the y coordinate where to place the image on the canvas
+  //width width of the image to use (stretch or shrink the image)
+  //height: height of the image to use (stretch or shrink the image)
+  function Drawable(image, name, options, callback){
+    this.name = name;
+    this.image = image;
+
+    this.sx = typeof options['sx'] !== 'undefined' ? this.sx : 0;
+    this.sy = typeof options['sy'] !== 'undefined' ? this.sy : 0;
+    this.swidth = typeof options['swidth'] !== 'undefined' ? this.swidth : image.width;
+    this.sheight = typeof options['sheight'] !== 'undefined' ? this.sheight : image.height;
+    this.x = typeof options['x'] !== 'undefined' ? this.x : 0;
+    this.y = typeof options['y'] !== 'undefined' ? this.y : 0;
+    this.width = typeof options['width'] !== 'undefined' ? this.width : image.width;
+    this.height = typeof options['height'] !== 'undefined' ? this.height : image.width;
+
+    this.moveSpeed = typeof options['moveSpeed'] !== 'undefined' ? this.moveSpeed : 0;    
+
+    this.direction = 0; //0N, 1E, 2S, 3W
+
+    if(typeof callback !== 'undefined'){
+      callback(this);
+    }
+  }
+
+  function SpriteManager(ctx){
+    //exposing this because there are just too many things that need changing on the fly to really make good use of mutators
+    this.drawables = [];
+    //We need something to hold just images that can be passed as references so we don't need to reload the same image a million times
+    this.sprites = {}; 
+
+    this.draw = function(){
+      if(this.drawables.length > 0){
+        for(var k in this.drawables){
+          ctx.drawImage(this.drawables[k].image,
+                        this.drawables[k].sx,
+                        this.drawables[k].sy,
+                        this.drawables[k].swidth,
+                        this.drawables[k].sheight,
+                        this.drawables[k].x,
+                        this.drawables[k].y,
+                        this.drawables[k].width,
+                        this.drawables[k].height)
+        }
+      }
+    };
+
+    this.addNew = function(name, img, options, callback){
+      //We kind of take it on good faith that this is only called when a new image is loaded, but even if it's a duplicate, it won't break anything... it'll just make this reference passing pretty pointless.
+      this.sprites[name] = img;
+
+      var drawable = new Drawable(img, name, options, callback);
+      this.drawables.push(drawable);
+    }
+
+    //For when we already have the image loaded in memory
+    this.addDrawable = function(name, options, callback){
+      var drawable = new Drawable(this.sprites[name], name, options, callback);
+      this.drawables.push(drawable);
+    }
+
+    this.findSprite = function(name){
+    }
+
+    this.print = function(){
+      console.log(this.sprites);
+    }
+  }
+
+  //Background doesn't get its own SM instance because it functions differently
+  var terrainManager = new SpriteManager(ctx);
+  var animateManager = new SpriteManager(ctx);
+
+  var pattern;
+
+  (function(){
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.rect(0, 0, c.width, c.height);
+
+    function loadImage(sm, url, name, options, callback){
+      var img = new Image();
+      img.src = url;
+      img.onload = function(){
+        sm.addNew(name, img, options, callback);
+      }
+    }
+
+    var background = new Image();
+    background.src = ('/images/grass.jpg');
+    background.onload = function(){
+      pattern = ctx.createPattern(background, 'repeat');
+      ctx.fillStyle = pattern;
+      ctx.fill();
+    }
+
+    var options = [];
+    loadImage(terrainManager, '/images/tree.png', 'tree', options, function(obj){
+      obj.x = 200,
+      obj.y = 200;
+    });
+
+    loadImage(terrainManager, '/images/mountain.png', 'mountain', options, function(drawable){
+      drawable.x = 400;
+      drawable.y = 400;
+    });
+
+    loadImage(animateManager, '/images/sample1.jpg', 'player1', options, function(drawable){
+     drawable.moveSpeed = 256;
+    });
+
+    var testArray = [ [0, 0, 0],
+                      [0, 1, 0],
+                      [0, 0, 0]];
+
+    populateMap(testArray, c.width, c.height);
+
+    function populateMap(array2d, canvasW, canvasH){
+      //takes a 2D array of ints, loads the appropriate sprites, and then pushes them to the correct sprite manager
+      var spacingH = canvasH/array2d.length;
+      var spacingW = canvasW/array2d[0].length;
+
+      var tm = terrainManager;
+
+      for(var i=0; i<array2d.length; i++){
+        for(var k=0; k<array2d[0].length; k++){
+          var x = spacingH * k;
+          var y = spacingW * i;
+
+          var options = [];
+          // tm.addDrawable('mountain', options, function(drawable){
+          //   drawable.x = x;
+          //   drawable.y = y;
+          // });
+
+        }
+      }
+    }
+
+    $("#myCanvas").keydown(function(e){
+      keysDown[e.keyCode] = true;
+    });
+
+    $("#myCanvas").keyup(function(e){
+      delete keysDown[e.keyCode];
+    });
+
+    $("#myCanvas").focus();
+
+    requestAnimationFrame(update);
+  }())
+
+  //////////////////////*****************************TEST AREA*****************************//////////////////
+
+    // terrainManager.print();
+
+    // console.log('terrainManager');
+    // console.log(terrainManager);
+    // console.log('terrainManager Sprites');
+    // console.log(typeof terrainManager.sprites);
+    // console.log('terrainManager sprites', terrainManager.sprites);
+
+    // for (var rasdfadsf in terrainManager.sprites){
+    //   console.log("Iterate.");
+    // }
+
+    // console.dir(terrainManager.sprites);
+
+    // console.dir('sprites' in terrainManager);
+    // console.dir('tree' in terrainManager.sprites);
+
+    // function TestClass(){
+    //   this.monkeys = {};
+
+    //   this.add = function(key, value){
+    //     this.monkeys[key] = value;
+    //   }
+
+    //   this.print = function(){
+    //     console.log(this.monkeys);
+    //   }
+    // }
+
+    // var myClass = new TestClass();
+
+    // (function(){
+    //   myClass.add('president', 'john');
+    //   myClass.add('janitor', 'fred');
+    // }());
+
+    // myClass.print();
+
+  //////////////////////*****************************TEST AREA*****************************//////////////////
+
+  function update(){
+    var now = Date.now();
+    var dt = (now - lastTime) / 1000.0;
+    lastTime = now;
+
+    handleUserInput(dt);
+    draw();
+
+    requestAnimationFrame(update);
+  }
+
+  //This needs some redoing to handle dynamic referencing better, but it works for now.
+  function handleUserInput(deltaTime){
+    if (87 in keysDown){ //W
+      animateManager.drawables[0].y -= deltaTime * 256;
+    }
+
+    if (65 in keysDown){ //A
+      animateManager.drawables[0].x -= deltaTime * 256;
+    }
+
+    if (83 in keysDown){ //S
+      animateManager.drawables[0].y += deltaTime * 256;
+    }
+
+    if (68 in keysDown){ //D
+      animateManager.drawables[0].x += deltaTime * 256;
+    }
+
+  }
+
+  function draw(){
+    drawBG();
+    terrainManager.draw();
+    animateManager.draw();
+  }
+
+  function drawBG(){
+    if(pattern){
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.rect(0, 0, c.width, c.height);
+      ctx.fillStyle = pattern;
+      ctx.fill();
+    }
+  }
+});

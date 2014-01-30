@@ -46,23 +46,3 @@ exports.compareHash = function(password, hash){
         }
    });
 };
-
-exports.checkIfUserExistsPG = function(email, callback){
-    var conString = "postgres://postgres:postgres@localhost/mydb";
-
-    var client = new pg.Client(conString);
-
-    client.connect(function(err) {
-        if(err) {
-            return console.error('could not connect to postgres', err);
-        }
-
-        client.query("select * from users where email=$1", [email], function (err, result){
-            if(err){
-                return console.error('Error running query: ', err);
-            }
-            callback(null, result.rows[0]); //if there's a match, this will be true
-            client.end();
-        });
-    });
-};

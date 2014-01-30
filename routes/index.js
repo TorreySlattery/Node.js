@@ -1,7 +1,5 @@
 module.exports = function Route(app){
 
-    var pg = require('pg');
-
     var bcrypt = require('bcrypt-nodejs');
     var account = require('./account');
 
@@ -26,7 +24,7 @@ module.exports = function Route(app){
 
         if(errors){
             req.flash('info', errors);
-           res.redirect('/register');
+            res.redirect('/register');
         }else{
 
             account.checkIfUserExistsMG(User, req.body['email'], function(err, result){
@@ -42,12 +40,12 @@ module.exports = function Route(app){
                         person.hash = hash_res;
       
                         account.saveUserMG(person, function(){
-                            console.log("Saved!");
+                            console.log("New registration saved!");
                         });
                     }); 
                     req.session.email = req.body['email'];
                     req.session.user_name = req.body['name'];
-                    res.redirect('/');            
+                    res.redirect('/lobby');            
                 }
             });
         }
@@ -63,7 +61,7 @@ module.exports = function Route(app){
                         if(bcrypt_res){
                             req.session.user_name = result['name'];
                             req.session.email = result['email'];
-                            res.redirect('/');
+                            res.redirect('/lobby');
                         }else{                            
                             req.flash('info', 'Invalid password.');
                             res.redirect('/login');
@@ -128,8 +126,8 @@ module.exports = function Route(app){
                                 });
     });
 
-    app.get('/help', function(req, res){
-        res.render('help', {title:'Node Tanks Help Page'
+    app.get('/lobby', function(req, res){
+        res.render('lobby', {title:'Node Tanks Lobby Page'
                                 , message: req.flash('info')
                                 , session: req.session
                                 });
@@ -144,72 +142,7 @@ module.exports = function Route(app){
         res.redirect('/');
     });
 
-
-    app.post('/process_registrationPG', function(req, res){
-        account.checkIfUserExistsPG(req.body['email'], function(err, result){
-            if(result){ //If user exists, registration fails
-                req.flash('info', 'User already exists.');
-                res.redirect('/register');
-
-            }else{ //If not, create new user
-
-                var conString = "postgres://postgres:postgres@localhost/mydb";
-
-                var client = new pg.Client(conString);
-
-                client.connect(function(err) {
-                    if(err) {
-                        return console.error('could not connect to postgres', err);
-                    }
-                    var name = req.body['name'];
-                    var email = req.body['email'];
-
-                    account.createHash(req.body['password'], function(err, hash_res){
-                        client.query("insert into users(name, email, hash, created_at) values($1, $2, $3, $4)", 
-                                [name, email, hash_res, "now()"], function (err, query_result) {
-                            if(err){
-                                return console.error('error running query', err);
-                            }                            
-                            client.end();
-                        });                        
-                    });                    
-                });
-                req.session.user_name = req.body['name'];
-                res.redirect('/');
-            }
-        });
-    });
-
-    app.post('/process_loginPG', function(req, res){
-        account.checkIfUserExistsPG(req.body['email'], function(err, result){
-            if(result){ //if user exists, check to see if the credentials work
-                bcrypt.compare(req.body['password'], result['hash'], function(err, bcrypt_res){
-                    if(err){
-                        return console.error('error comparing password.', err);
-                    }else{
-                        if(bcrypt_res){
-                            req.session.user_name = result['name'];
-                            res.redirect('/');
-                        }else{                            
-                            req.flash('info', 'Invalid password.');
-                            res.redirect('/login');
-                        }
-                    }
-                });
-                res.redirect('/login');
-            }else{ //if not, redirect back to the login page with any errors
-                req.flash('info', 'User does not exist.'); //I wouldn't want to give this specific of an error message normally, but eh.
-                res.redirect('/login');
-            }        
-        });
-    });
-
     app.io.route("new_user", function(req){
         console.log("New user emit fired: ", req.data);
     });
-
-    // app.io.route('disconnect', function(req){
-    //     // console.log("Client disconnected.", req.sessionID);
-    //     req.io.broadcast('disconnect', {id: req.sessionID});
-    // });
 }

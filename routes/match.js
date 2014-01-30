@@ -42,6 +42,7 @@ module.exports = function Match(app){
 
     if(checkins[gameID]){
       console.log("Both users checked in for gameID: " + gameID + ". Server generating a maze to send to the clients.")
+      delete checkins[gameID] //For multiple games in a row
       var x = Math.floor(Math.random()*24)
       var y = Math.floor(Math.random()*14)
       var map = maze.generateMaze(x, y)
@@ -68,8 +69,28 @@ module.exports = function Match(app){
     }
   });
 
+  app.io.route("i_got_shot", function(req){
+    var gameID = belongs_to[req.session.email]
+    app.io.room(gameID).broadcast('update_score', req.data);
+  });
+
+  app.io.route("end_game", function(req){
+    var gameID = belongs_to[req.session.email]
+    if(games[gameID]) delete games[gameID]
+
+    if(belongs_to[req.session.email]) delete belongs_to[req.session.email]
+  });
+
   app.io.route('disconnect', function(req){
+    console.log(req.sessionID + " disconnected.")
+    console.log(req.session)
     delete lobbyUsers[req.sessionID];
+    if(belongs_to[req.session.email]){
+      console.log("User disconnected. Removing any games that they were attached to.")
+      delete games[belongs_to[req.session.email]]
+      // delete belongs_to[req.session.email]
+      app.io.room('lobby').broadcast('update_lobby', games)
+    }    
     app.io.room('lobby').broadcast('user_left_lobby', {
       usersInLobby: lobbyUsers
     });

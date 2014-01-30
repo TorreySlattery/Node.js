@@ -1,0 +1,62 @@
+*{
+    font-family: sans-serif;
+}
+
+body{
+    background: -webkit-linear-gradient(left, 
+        rgb(25, 17, 12) 0%,
+        rgb(40, 29, 22) 24%, 
+        rgb(45, 32, 25) 50%,
+        rgb(40, 29, 22) 79%,
+        rgb(25, 17, 12) 100%); 
+}
+
+button{
+    background-color: white;
+    border-radius: 5px;
+}
+
+.reg-empty{
+    padding-left: 70%;
+}
+
+.reg-empty, .reg-log-box, .help-box{
+    display: inline;
+}
+
+.reg-log-box, .help-box{
+    display: inline;
+    background-color: rgb(149, 125, 94);
+    border-radius: 2px;
+}
+
+
+.main-body, .twitter-box{
+    display: inline-block;
+    vertical-align: top;
+}
+
+.account-item{
+}
+
+.reg-container{
+}
+
+.container{
+    padding: 10px 20px 20px 20px;
+    width: 1000px;
+}
+
+.main-content{
+    background-color: rgb(149, 125, 94);
+}
+
+.media-box{
+    width: 640px;
+    height: 480px;
+    background-color: hsl(237, 20%, 30%);
+    border-radius: 5px;
+}
+
+.twitter-box{
+}
