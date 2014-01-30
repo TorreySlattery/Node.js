@@ -1,0 +1,43 @@
+2014-01-30T00:14:19+00:00 heroku[slug-compiler]: Slug compilation started
+2014-01-30T00:15:02.803904+00:00 heroku[api]: Scale to web=1 by torrey.slattery@gmail.com
+2014-01-30T00:15:02.839380+00:00 heroku[api]: Deploy 129ac4c by torrey.slattery@gmail.com
+2014-01-30T00:15:03+00:00 heroku[slug-compiler]: Slug compilation finished
+2014-01-30T00:15:02.976614+00:00 heroku[api]: Release v3 created by torrey.slattery@gmail.com
+2014-01-30T00:15:05.892616+00:00 heroku[web.1]: Starting process with command `npm start`
+2014-01-30T00:15:06.605880+00:00 heroku[web.1]: Starting process with command `npm start`
+2014-01-30T00:15:07.143336+00:00 app[web.1]: > application-name@0.0.1 start /app
+2014-01-30T00:15:07.143336+00:00 app[web.1]: 
+2014-01-30T00:15:07.143336+00:00 app[web.1]: 
+2014-01-30T00:15:07.143336+00:00 app[web.1]: > node app.js
+2014-01-30T00:15:07.431203+00:00 app[web.1]: connect.multipart() will be removed in connect 3.0
+2014-01-30T00:15:07.431564+00:00 app[web.1]: visit https://github.com/senchalabs/connect/wiki/Connect-3.0 for alternatives
+2014-01-30T00:15:07.431999+00:00 app[web.1]: connect.limit() will be removed in connect 3.0
+2014-01-30T00:15:07.718943+00:00 app[web.1]: Server active and listening on port 6789
+2014-01-30T00:15:07.956538+00:00 app[web.1]: 
+2014-01-30T00:15:07.956538+00:00 app[web.1]: > application-name@0.0.1 start /app
+2014-01-30T00:15:07.956538+00:00 app[web.1]: > node app.js
+2014-01-30T00:15:07.956538+00:00 app[web.1]: 
+2014-01-30T00:15:08.259913+00:00 app[web.1]: connect.multipart() will be removed in connect 3.0
+2014-01-30T00:15:08.260320+00:00 app[web.1]: visit https://github.com/senchalabs/connect/wiki/Connect-3.0 for alternatives
+2014-01-30T00:15:08.260762+00:00 app[web.1]: connect.limit() will be removed in connect 3.0
+2014-01-30T00:15:08.573105+00:00 app[web.1]: Server active and listening on port 6789
+2014-01-30T00:16:06.212768+00:00 heroku[web.1]: Error R10 (Boot timeout) -> Web process failed to bind to $PORT within 60 seconds of launch
+2014-01-30T00:16:06.213074+00:00 heroku[web.1]: Stopping process with SIGKILL
+2014-01-30T00:16:06.989902+00:00 heroku[web.1]: Stopping process with SIGKILL
+2014-01-30T00:16:06.989306+00:00 heroku[web.1]: Error R10 (Boot timeout) -> Web process failed to bind to $PORT within 60 seconds of launch
+2014-01-30T00:16:07.844019+00:00 heroku[web.1]: Process exited with status 137
+2014-01-30T00:16:10.098241+00:00 heroku[web.1]: Process exited with status 137
+2014-01-30T00:16:12.558722+00:00 heroku[web.1]: Starting process with command `npm start`
+2014-01-30T00:16:13.576089+00:00 app[web.1]: 
+2014-01-30T00:16:13.576089+00:00 app[web.1]: > application-name@0.0.1 start /app
+2014-01-30T00:16:13.576089+00:00 app[web.1]: > node app.js
+2014-01-30T00:16:13.576089+00:00 app[web.1]: 
+2014-01-30T00:16:13.841390+00:00 app[web.1]: connect.multipart() will be removed in connect 3.0
+2014-01-30T00:16:13.842132+00:00 app[web.1]: connect.limit() will be removed in connect 3.0
+2014-01-30T00:16:13.841685+00:00 app[web.1]: visit https://github.com/senchalabs/connect/wiki/Connect-3.0 for alternatives
+2014-01-30T00:16:14.107440+00:00 app[web.1]: Server active and listening on port 6789
+2014-01-30T00:17:12.595788+00:00 heroku[web.1]: Error R10 (Boot timeout) -> Web process failed to bind to $PORT within 60 seconds of launch
+2014-01-30T00:17:12.595953+00:00 heroku[web.1]: Stopping process with SIGKILL
+2014-01-30T00:17:13.786270+00:00 heroku[web.1]: Process exited with status 137
+2014-01-30T00:17:16.367840+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path=/favicon.ico host=murmuring-ridge-2905.herokuapp.com request_id=bd054c79-d250-4dd0-ab2c-4ec44e794dc1 fwd="50.47.89.25" dyno= connect= service= status=503 bytes=
+2014-01-30T00:17:16.476248+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path=/favicon.ico host=murmuring-ridge-2905.herokuapp.com request_id=0dbdada0-0a40-491b-aef0-84b1ab6e6589 fwd="50.47.89.25" dyno= connect= service= status=503 bytes=
