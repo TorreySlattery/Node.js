@@ -1,11 +1,13 @@
 var bcrypt = require('bcrypt-nodejs');
 
 var mongoose = require('mongoose');
+var uristring = process.env.MONGOLAB_URI ||
+        'mongodb://localhost/test'
 
 exports.checkIfUserExistsMG = function(model, email, callback){
     var db = mongoose.connection;
 
-    mongoose.connect('mongodb://localhost/test');
+    mongoose.connect(uristring);
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function(){
         model.find({ email: email}, function(err, person){
