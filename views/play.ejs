@@ -55,7 +55,7 @@
 
         </div>
         <div class="col-md-4"></div>
-        <div>
+        <div id="canvas-container">
           <canvas id="myCanvas" width="1000" height="600" tabindex="1" style="z-index: 2">Alas, your browser does not support HTML5 canvas and thus won't be able to play this game!</canvas>
         </div>
       </div>
@@ -90,7 +90,10 @@
       console.log("The server has acknoledged your checkin.")
     })
 
+    var iam = 0;
+
     io.on('you_are_player1', function(data){
+      iam = 1;
       window.maze = data
 
       $.getScript("/javascripts/player1.js", function(){
@@ -106,6 +109,7 @@
     })
 
     io.on('you_are_player2', function(data){
+      iam = 2;
       window.maze = data
 
       $.getScript("/javascripts/player2.js", function(){
@@ -128,8 +132,9 @@
         if(currentScore>9 && !gameOver){
           gameOver = !gameOver
           io.emit('end_game')
-          alert("Player 2 wins!\nPress OK to return to the lobby.")
-          window.location.href = '/lobby'
+          if(iam == 2){
+            $("#playField").html("You win! <a href='/lobby'>Click here to return to the lobby.</a>")
+          }else{ $("#playField").html("You lose :( <a href='/lobby'>Click here to return to the lobby.</a>")}
         }else{
           $("#player2-score").html(currentScore)
         }
@@ -138,9 +143,11 @@
         currentScore++
         if(currentScore>9 && !gameOver){
           gameOver = !gameOver
-          io.emit('end_game')
-          alert("Player 1 wins!\nPress OK to return to the lobby.")
-          window.location.href = '/lobby'
+          io.emit('end_game')          
+          if(iam == 1){
+            $("#playField").html("You win! <a href='/lobby'>Click here to return to the lobby.</a>")
+          }else{ $("#playField").html("You lose :( <a href='/lobby'>Click here to return to the lobby.</a>")}
+
         }else{
           $("#player1-score").html(currentScore)
         }
